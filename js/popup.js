@@ -1,8 +1,9 @@
 
 import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
-import { CHANNEL_ADD_BUTTON_ID, CHANNEL_INPUT_ID, DELETE_BUTTON_ID, INPUT_ERROR_ID, SUBMIT_BUTTON_ID } from "./modules/constants.js";
+import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
 import { watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -20,8 +21,8 @@ async function _handleDeleteSelectedChannels(e) {
 }
 
 function _handleAddChannels(e) {
-    const inputElem = document.getElementById(CHANNEL_INPUT_ID);
-    const inputError = document.getElementById(INPUT_ERROR_ID);
+    const inputElem = document.getElementById(POPUP_CHANNEL_INPUT_ID);
+    const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
     var inputValue = inputElem.value.trim().toLowerCase();
     inputElem.value = "";
     if (inputValue.length === 0) {
@@ -49,8 +50,8 @@ function _handleAddChannels(e) {
 
     }
     addChannelsToStorage(channels).then(() => {
-        clearTable();
-        drawTable();
+        clearTable(POPUP_CHANNEL_TABLE_ID);
+        drawTable(POPUP_CHANNEL_TABLE_ID);
     });
 }
 
@@ -62,11 +63,11 @@ function _handleWatchChannels(e) {
 }
 
 function _onReady() {
-    const addChannelButton = document.getElementById(CHANNEL_ADD_BUTTON_ID);
-    const submitButton = document.getElementById(SUBMIT_BUTTON_ID);
-    const inputError = document.getElementById(INPUT_ERROR_ID);
-    const channelInput = document.getElementById(CHANNEL_INPUT_ID);
-    const deleteButton = document.getElementById(DELETE_BUTTON_ID);
+    const addChannelButton = document.getElementById(POPUP_CHANNEL_ADD_BUTTON_ID);
+    const submitButton = document.getElementById(POPUP_SUBMIT_BUTTON_ID);
+    const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
+    const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
+    const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
 
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);
@@ -81,7 +82,7 @@ function _onReady() {
 
     deleteButton.addEventListener("click", _handleDeleteSelectedChannels);
 
-    initTable();
+    initTable("#" + POPUP_CHANNEL_TABLE_ID);
 }
 
 

@@ -1,12 +1,12 @@
 import { isChannelLive } from "./channel.js";
-import { CHANNEL_TABLE_ID, DATASET_IS_LIVE_FALSE, DATASET_IS_LIVE_TRUE, STORAGE_CHANNELS_KEY } from "./constants.js";
+import { STORAGE_CHANNELS_KEY, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE } from "./constants.js";
 import { readLocalStorage } from "./storage.js";
 import { isWatchingChannel } from "./tab.js";
 
-function initTable() {
+function initTable(selector) {
 
     DataTable.Buttons.defaults.dom.button.className = 'btn';
-    var table = $("#" + CHANNEL_TABLE_ID).DataTable({
+    var table = $(selector).DataTable({
         dom: "Bt",
         columns: [
             {
@@ -45,8 +45,8 @@ function initTable() {
                     selectAll.checked = false;
                     var selectLive = document.getElementById("select-live");
                     selectLive.checked = false;
-                    clearTable();
-                    drawTable();
+                    clearTable(selector);
+                    drawTable(selector);
                 }
             },
             {
@@ -71,7 +71,7 @@ function initTable() {
                 text: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="icon"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M566.6 54.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192-34.7-34.7c-4.2-4.2-10-6.6-16-6.6c-12.5 0-22.6 10.1-22.6 22.6l0 29.1L364.3 320l29.1 0c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16l-34.7-34.7 192-192zM341.1 353.4L222.6 234.9c-42.7-3.7-85.2 11.7-115.8 42.3l-8 8C76.5 307.5 64 337.7 64 369.2c0 6.8 7.1 11.2 13.2 8.2l51.1-25.5c5-2.5 9.5 4.1 5.4 7.9L7.3 473.4C2.7 477.6 0 483.6 0 489.9C0 502.1 9.9 512 22.1 512l173.3 0c38.8 0 75.9-15.4 103.4-42.8c30.6-30.6 45.9-73.1 42.3-115.8z"/></svg>',
                 className: "btn-danger",
                 action: function(e, dt, node, config) {
-                    var table = getTable();
+                    var table = getTable(selector);
                     var rows = table.rows().nodes();
                     for (var i = 0; i < rows.length; i++) {
                         var row = rows[i];
@@ -82,7 +82,7 @@ function initTable() {
                     selectAll.checked = false;
                     var selectLive = document.getElementById("select-live");
                     selectLive.checked = false;
-                    _updateDeleteButtonVisibility();
+                    _updateDeleteButtonVisibility(selector);
                 }
             }
         ]
@@ -95,47 +95,51 @@ function initTable() {
         });
     };
 
-    drawTable();
+    drawTable(selector);
 
     var selectAll = document.getElementById("select-all");
-    selectAll.addEventListener("change", _handleSelectAll);
+    selectAll.addEventListener("change", function(e) {
+        _handleSelectAll(selector, e);
+    });
     selectAll.addEventListener("click", (e) => e.stopPropagation());
 
     var selectLive = document.getElementById("select-live");
-    selectLive.addEventListener("change", _handleSelectLive);
+    selectLive.addEventListener("change", function(e) {
+        _handleSelectLive(selector, e);
+    });
     selectLive.addEventListener("click", (e) => e.stopPropagation());
 
     return table;
 }
 
-function _handleSelectAll(e) {
+function _handleSelectAll(selector, e) {
     var targetChecked = e.target.checked;
-    var table = getTable();
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         var checkbox = $(row).find('input[type="checkbox"][name="channel-select"]');
         checkbox.prop('checked', targetChecked);
     }
-    _updateDeleteButtonVisibility();
+    _updateDeleteButtonVisibility(selector);
 }
 
-function _handleSelectLive(e) {
+function _handleSelectLive(selector, e) {
     var targetChecked = e.target.checked;
-    var table = getTable();
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
-        if (row.dataset.isLive === DATASET_IS_LIVE_TRUE) {
+        if (row.dataset.isLive === TABLE_DATASET_FALSE) {
             var checkbox = $(row).find('input[type="checkbox"][name="channel-select"]');
             checkbox.prop('checked', targetChecked);
         }
     }
-    _updateDeleteButtonVisibility();
+    _updateDeleteButtonVisibility(selector);
 }
 
-function _areAnyChecked() {
-    var table = getTable();
+function _areAnyChecked(selector) {
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     var anyChecked = false;
     for (var i = 0; i < rows.length; i++) {
@@ -149,14 +153,14 @@ function _areAnyChecked() {
     return anyChecked;
 }
 
-function _updateDeleteButtonVisibility() {
-    var anyChecked = _areAnyChecked();
+function _updateDeleteButtonVisibility(selector) {
+    var anyChecked = _areAnyChecked(selector);
     var deleteButton = document.getElementById("delete-button");
     deleteButton.style.display = anyChecked ? "block" : "none";
 }
 
-function selectChannels(channels) {
-    var table = getTable();
+function selectChannels(selector, channels) {
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
@@ -166,21 +170,21 @@ function selectChannels(channels) {
     }
 }
 
-function drawTable() {
+function drawTable(selector) {
     readLocalStorage(STORAGE_CHANNELS_KEY).then((channels) => {
         channels.forEach((channel) => {
-            addRow(channel);
+            addRow(selector, channel);
         });
     });
 }
 
-function clearTable() {
-    var table = getTable();
+function clearTable(selector) {
+    var table = getTable(selector);
     table.clear();
 }
 
-function addRow(channel) {
-    var table = getTable();
+function addRow(selector, channel) {
+    var table = getTable(selector);
     isChannelLive(channel).then((isLive) => {
         isWatchingChannel(channel).then((isWatching) => {
             var row = table.row.add([
@@ -189,22 +193,24 @@ function addRow(channel) {
                 isLive ? "Live" : "Offline"
             ]).draw().node();
             row.dataset.channel = channel;
-            row.dataset.isLive = isLive ? DATASET_IS_LIVE_TRUE : DATASET_IS_LIVE_FALSE;
+            row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
             var checkbox = $(row).find('input[type="checkbox"]');
             checkbox.prop('checked', isWatching);
-            checkbox.on('change', _updateDeleteButtonVisibility);
-            _updateDeleteButtonVisibility();
+            checkbox.on('change', function() {
+                _updateDeleteButtonVisibility(selector);
+            });
+            _updateDeleteButtonVisibility(selector);
         });
     });
 }
 
-function getTable() {
+function getTable(selector) {
     // Return existing DataTable instance
-    return $("#" + CHANNEL_TABLE_ID).DataTable();
+    return $(selector).DataTable();
 }
 
-function getSelectedRows(asArray=false) {
-    var table = getTable();
+function getSelectedRows(selector, asArray=false) {
+    var table = getTable(selector);
     var data = table
     .rows( function ( idx, data, node ) {
         return $(node).find('input[type="checkbox"][name="channel-select"]').prop('checked');
@@ -218,39 +224,39 @@ function getSelectedRows(asArray=false) {
     return data
 }
 
-function getSelectedChannels() {
-    var selectedRows = getSelectedRows(true);
+function getSelectedChannels(selector) {
+    var selectedRows = getSelectedRows(selector, true);
     return selectedRows.map((row) => row[1]);
 }
 
-function getLiveChannels() {
-    var table = getTable();
+function getLiveChannels(selector) {
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     var liveChannels = [];
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
-        if (row.dataset.isLive === DATASET_IS_LIVE_TRUE) {
+        if (row.dataset.isLive === TABLE_DATASET_FALSE) {
             liveChannels.push(row.dataset.channel);
         }
     }
     return liveChannels;
 }
 
-function allLiveChannelsChecked() {
-    return _areChannelsChecked(true);
+function allLiveChannelsChecked(selector) {
+    return _areChannelsChecked(selector, true);
 }
 
-function allChannelsChecked() {
-    return _areChannelsChecked(false);
+function allChannelsChecked(selector) {
+    return _areChannelsChecked(selector, false);
 }
 
-function _areChannelsChecked(isLiveCheck=false) {
-    var table = getTable();
+function _areChannelsChecked(selector, isLiveCheck=false) {
+    var table = getTable(selector);
     var rows = table.rows().nodes();
     var allChecked = true;
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
-        if (isLiveCheck && row.dataset.isLive !== DATASET_IS_LIVE_TRUE) {
+        if (isLiveCheck && row.dataset.isLive !== TABLE_DATASET_FALSE) {
             return;
         }
         var checkbox = row.querySelector(".channel-checkbox");

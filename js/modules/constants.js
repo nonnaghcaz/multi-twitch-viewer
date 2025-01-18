@@ -1,20 +1,32 @@
-const CHANNEL_TABLE_ID = "channel-table";
-const CHANNEL_ADD_BUTTON_ID = "add-button";
-const CHANNEL_INPUT_ID = "channel-input";
-const INPUT_ERROR_ID = "input-error";
+
+// storage.js
 const STORAGE_CHANNELS_KEY = "channels";
-const SUBMIT_BUTTON_ID = "submit-button";
-const SELECT_ALL_ID = "select-all";
-const SELECT_LIVE_ID = "select-live";
-const DELETE_BUTTON_ID = "delete-button";
-const SELECT_CLEAR_ID = "select-clear";
-const REFRESH_BUTTON_ID = "refresh-button";
 
-const DATASET_CHANNEL = "channel";
-const DATASET_IS_LIVE = "isLive";
+// popup.js
+const POPUP_CHANNEL_TABLE_ID = "channel-table";
+const POPUP_CHANNEL_ADD_BUTTON_ID = "add-button";
+const POPUP_CHANNEL_INPUT_ID = "channel-input";
+const POPUP_INPUT_ERROR_ID = "input-error";
+const POPUP_SUBMIT_BUTTON_ID = "submit-button";
 
-const DATASET_IS_LIVE_TRUE = "1";
-const DATASET_IS_LIVE_FALSE = "0";
+// table.js
+const TABLE_REFRESH_BUTTON_ID = "refresh-button";
+const TABLE_SELECT_ALL_ID = "select-all";
+const TABLE_SELECT_LIVE_ID = "select-live";
+const TABLE_SELECT_CLEAR_ID = "select-clear";
+const TABLE_DELETE_BUTTON_ID = "delete-button";
 
-export { CHANNEL_ADD_BUTTON_ID, CHANNEL_INPUT_ID, CHANNEL_TABLE_ID, DATASET_CHANNEL, DATASET_IS_LIVE, DATASET_IS_LIVE_FALSE, DATASET_IS_LIVE_TRUE, DELETE_BUTTON_ID, INPUT_ERROR_ID, REFRESH_BUTTON_ID, SELECT_ALL_ID, SELECT_CLEAR_ID, SELECT_LIVE_ID, STORAGE_CHANNELS_KEY, SUBMIT_BUTTON_ID };
+const TABLE_DATASET_CHANNEL = "channel";
+const TABLE_DATASET_IS_LIVE = "isLive";
+
+const TABLE_DATASET_TRUE = "1";
+const TABLE_DATASET_FALSE = "0";
+
+export {
+    POPUP_CHANNEL_ADD_BUTTON_ID,
+    POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID,
+    POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, TABLE_DATASET_CHANNEL, TABLE_DATASET_FALSE, TABLE_DATASET_IS_LIVE,
+    TABLE_DATASET_TRUE, TABLE_DELETE_BUTTON_ID, TABLE_REFRESH_BUTTON_ID,
+    TABLE_SELECT_ALL_ID, TABLE_SELECT_CLEAR_ID, TABLE_SELECT_LIVE_ID
+};
 

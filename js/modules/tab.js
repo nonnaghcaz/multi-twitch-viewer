@@ -44,5 +44,5 @@ async function watchChannels(channels) {
     }
 }
 
-export { getChannelsFromTabUrl, getTabUrl, isOnMultiStreamPage, isWatchingChannel, watchChannels };
+export { getChannelsFromTabUrl, getTabUrl, isOnMultiStreamPage, isOnTwitchPage, isWatchingChannel, watchChannels };
 

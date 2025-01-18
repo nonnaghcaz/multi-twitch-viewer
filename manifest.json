@@ -1,0 +1,32 @@
+{
+    "action": {
+      "default_icon": {
+
+      },
+      "default_popup": "popup.html"
+    },
+    "author": "Zach Gannon",
+    "background": {
+      "service_worker": "/js/background.js",
+      "type": "module"
+    },
+    "description": "When you want to get all the perspectives at once.",
+    "icons": {
+    },
+    "manifest_version": 3,
+    "name": "Multi Twitch Viewer",
+    "options_page": "settings.html",
+    "optional_host_permissions": [
+      "<all_urls>"
+    ],
+    "host_permissions": [
+      "https://*.twitch.tv/*"
+    ],
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+    ],
+    "short_name": "MTV",
+    "version": "0.0.1"
+  }

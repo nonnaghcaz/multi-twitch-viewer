@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor/datatables.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <title>Multi Twitch Viewer</title>
+</head>
+<body>
+    <div class="container pt-2 ps-2 pe-2">
+        <h1>Multi Twitch Viewer</h1>
+
+        <div class="row pb-2">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Enter Twitch Channel(s)" id="channel-input">
+
+                <button class="btn btn-primary" type="button" id="add-button">Add</button>
+            </div>
+            <small id="input-help" class="form-text text-white-50">Separate multiple channels with commas</small>
+            <small id="input-error" class="form-text text-danger" style="display: none;"></small>
+        </div>
+        <div class="row pb-2">
+            <table id="channel-table" class="table table-dark table-striped"></table>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-auto">
+                <button id="submit-button" class="btn btn-success">Watch</button>
+            </div>
+            <div class="col-auto ms-auto">
+                <button id="delete-button" class="btn btn-danger" style="display: none;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="js/vendor/jquery-3.7.1.min.js"></script>
+    <script src="js/vendor/datatables.min.js"></script>
+    <script src="js/popup.js" type="module"></script>
+</body>
+<footer>
+
+    <div class="container p-2">
+        <hr>
+        <small class="text-white-50">Multi Twitch Viewer is a simple MV3 Chrome extension designed to easily allow keeping track of, creating MultiStre.am links for, and simultaneously watching your favorite Twitch streamers. No affiliation with Twitch or MultiStre.am.</small>
+        <br>
+        <small class="text-white-50"><a href="https://github.com/nonnaghcaz/multi-twitch-viewer" target="_blank">GitHub repo</a></small>
+    </div>
+</footer>
+</html>

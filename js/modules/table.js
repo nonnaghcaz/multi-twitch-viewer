@@ -20,7 +20,10 @@ function initTable() {
             },
             {
                 title: "Channel",
-                orderable: true
+                orderable: true,
+                render: function(data, type, row) {
+                    return `<a href="https://twitch.tv/${data}" target="_blank">${data}</a>`;
+                }
             },
             {
                 title: "Status",

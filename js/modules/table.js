@@ -25,7 +25,10 @@ function initTable() {
             {
                 title: "Status",
                 orderable: true,
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
+                }
             }
         ],
         scrollY: "300px",

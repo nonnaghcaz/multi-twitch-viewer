@@ -1,6 +1,7 @@
 async function getChannelsFromTabUrl() {
     const url = await getTabUrl();
-    var channels = url.split("/").filter((part) => part.length > 0);
+const urlObj = new URL(url);
+    var channels = urlObj.pathname.split("/").filter((part) => part.length > 0);
     return channels;
 }
 

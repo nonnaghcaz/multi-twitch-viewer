@@ -22,6 +22,11 @@ async function isOnMultiStreamPage() {
     return url.startsWith("https://multistre.am/");
 }
 
+async function isOnTwitchPage() {
+    const url = await getTabUrl();
+    return url.startsWith("https://www.twitch.tv/");
+}
+
 async function isWatchingChannel(channel) {
     channel = channel.trim().toLowerCase();
     if (channel.length === 0) {

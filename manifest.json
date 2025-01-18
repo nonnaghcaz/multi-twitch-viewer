@@ -10,7 +10,7 @@
       "service_worker": "/js/background.js",
       "type": "module"
     },
-    "description": "When you want to get all the perspectives at once.",
+    "description": "Keep track of, create MultiStre.am links for, and simultaneously watch your favorite Twitch streamers.",
     "icons": {
     },
     "manifest_version": 3,

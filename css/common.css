@@ -1,19 +1,9 @@
 body {
-    color: var(--bs-light);
-    background-color: var(--bs-dark);
     font: 1rem 'Roboto', sans-serif;
 }
 
 svg {
     fill: var(--bs-light);
-}
-
-a {
-    color: var(--bs-light);
-}
-
-a:hover {
-    color: var(--bs-light);
 }
 
 .icon {

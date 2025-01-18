@@ -4,7 +4,7 @@ import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABL
 import { watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
-
+const SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
 
 document.addEventListener("DOMContentLoaded", function() {
     _onReady();
@@ -14,8 +14,8 @@ async function _handleDeleteSelectedChannels(e) {
     var selectedChannels = getSelectedChannels();
     if (selectedChannels.length > 0) {
         removeChannelsFromStorage(selectedChannels).then(() => {
-            clearTable();
-            drawTable();
+            clearTable(SELECTOR);
+            drawTable(SELECTOR);
         });
     }
 }
@@ -50,13 +50,13 @@ function _handleAddChannels(e) {
 
     }
     addChannelsToStorage(channels).then(() => {
-        clearTable(POPUP_CHANNEL_TABLE_ID);
-        drawTable(POPUP_CHANNEL_TABLE_ID);
+        clearTable(SELECTOR);
+        drawTable(SELECTOR);
     });
 }
 
 function _handleWatchChannels(e) {
-    var selectedChannels = getSelectedChannels();
+    var selectedChannels = getSelectedChannels(SELECTOR);
     if (selectedChannels.length > 0) {
         watchChannels(selectedChannels);
     }
@@ -82,7 +82,7 @@ function _onReady() {
 
     deleteButton.addEventListener("click", _handleDeleteSelectedChannels);
 
-    initTable("#" + POPUP_CHANNEL_TABLE_ID);
+    initTable(SELECTOR);
 }
 
 

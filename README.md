@@ -1,7 +1,7 @@
 Multi Twitch Viewer
 ===================
 
-![Example Screenshot](img/example-screenshot.png)
+![Example Screenshot](docs/example-screenshot.png)
 
 Multi Twitch Viewer is a simple MV3 Chrome extension designed to easily allow keeping track of, creating MultiStre.am links for, and simultaneously watching your favorite Twitch streamers.
 

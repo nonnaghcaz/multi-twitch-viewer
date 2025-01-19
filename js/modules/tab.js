@@ -19,11 +19,17 @@ async function getTabUrl() {
 
 async function isOnMultiStreamPage() {
     const url = await getTabUrl();
+    if (!url) {
+        return false;
+    }
     return url.startsWith("https://multistre.am/");
 }
 
 async function isOnTwitchPage() {
     const url = await getTabUrl();
+    if (!url) {
+        return false;
+    }
     return url.startsWith("https://www.twitch.tv/");
 }
 

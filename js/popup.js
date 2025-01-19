@@ -1,7 +1,8 @@
 
 import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
-import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
-import { watchChannels } from "./modules/tab.js";
+import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
+import { valueInLocalStorage } from "./modules/storage.js";
+import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
 const SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
@@ -82,10 +83,32 @@ function _onReady() {
 
     deleteButton.addEventListener("click", _handleDeleteSelectedChannels);
 
+    isOnTwitchPage().then((isOnTwitch) => {
+        if (isOnTwitch) {
+            getChannelsFromTabUrl().then((channels) => {
+                channels.forEach((channel) => {
+                    valueInLocalStorage(STORAGE_CHANNELS_KEY, channel).then((isInStorage) => {
+                        if (!isInStorage) {
+                            _appendChannelInput(channel);
+                        }
+                    });
+                });
+            });
+        }
+    });
     initTable(SELECTOR);
 }
 
+function _appendChannelInput(channel) {
+    const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
+    var value = channelInput.value;
+    if (value.length > 0) {
+        value += ", ";
+    }
+    value += channel;
 
+    channelInput.value = value;
+}
 
 
 

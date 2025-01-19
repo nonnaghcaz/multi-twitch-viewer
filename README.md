@@ -7,6 +7,6 @@ Multi Twitch Viewer is a simple MV3 Chrome extension designed to easily allow ke
 
 This is my first real attempt at making a function Chrome extension, so there are sure to be issues.
 
-Nothing in the chrome store, you need to load unpacked to use.
+Nothing in the chrome store, you need to download and load unpacked to use.
 
 No affiliation with Twitch or MultiStre.am.

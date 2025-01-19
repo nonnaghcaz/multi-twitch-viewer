@@ -16,5 +16,20 @@ chrome.runtime.onMessage.addListener(
                 });
             return true;
         }
+        if (request.contentScriptQuery == "getStreamTitle") {
+            var channel = request.channel;
+            fetch(`https://twitch.tv/${channel}`)
+                .then(response => response.text())
+                .then(text => {
+                    var descriptionMatch = text.match(/<meta[^>]*name=.*["']description["'][^>]*content=["']([^"']*)["'][^>]*>/);
+                    
+                    var description = descriptionMatch ? descriptionMatch[1] : null;
+                    sendResponse({streamTitle: description});
+                }).catch(error => {
+                    console.error(`Error fetching channel ${channel}: ${error}`);
+                    sendResponse({streamTitle: null});
+                });
+            return true;
+        }
     }
 );

@@ -33,7 +33,8 @@ async function isWatchingChannel(channel) {
         return;
     }
     const isOnMultiStreamPageResult = await isOnMultiStreamPage();
-    if (!isOnMultiStreamPageResult) {
+    const isOnTwitchPageResult = await isOnTwitchPage();
+    if (!(isOnMultiStreamPageResult || isOnTwitchPageResult)) {
         return false;
     }
     const channels = await getChannelsFromTabUrl();

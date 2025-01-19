@@ -38,4 +38,15 @@ const removeKeyFromLocalStorage = async (key) => {
     });
 }
 
-export { clearLocalStorage, keyInLocalStorage, readLocalStorage, removeKeyFromLocalStorage, writeLocalStorage };
+const valuesInLocalStorage = async (key, values) => {
+    const storedValues = await readLocalStorage(key);
+    return values.every(value => storedValues.includes(value));
+}
+
+const valueInLocalStorage = async (key, value) => {
+    const storedValues = await readLocalStorage(key);
+    return storedValues.includes(value);
+}
+
+export { clearLocalStorage, keyInLocalStorage, readLocalStorage, removeKeyFromLocalStorage, valueInLocalStorage, valuesInLocalStorage, writeLocalStorage };
+

@@ -1,7 +1,8 @@
-import { isChannelLive } from "./channel.js";
+import { getStreamTitle, isChannelLive } from "./channel.js";
 import { STORAGE_CHANNELS_KEY, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE } from "./constants.js";
 import { readLocalStorage } from "./storage.js";
 import { isWatchingChannel } from "./tab.js";
+
 
 function initTable(selector) {
 
@@ -31,6 +32,13 @@ function initTable(selector) {
                 className: "text-center",
                 render: function(data, type, row) {
                     return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
+                }
+            },
+            {
+                title: "Title",
+                orderable: false,
+                render: function(data, type, row) {
+                    return data;
                 }
             }
         ],
@@ -187,19 +195,22 @@ function addRow(selector, channel) {
     var table = getTable(selector);
     isChannelLive(channel).then((isLive) => {
         isWatchingChannel(channel).then((isWatching) => {
-            var row = table.row.add([
-                isWatching ? 1 : 0, 
-                channel, 
-                isLive ? "Live" : "Offline"
-            ]).draw().node();
-            row.dataset.channel = channel;
-            row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
-            var checkbox = $(row).find('input[type="checkbox"]');
-            checkbox.prop('checked', isWatching);
-            checkbox.on('change', function() {
+                getStreamTitle(channel).then((streamTitle) => {
+                var row = table.row.add([
+                    isWatching ? 1 : 0, 
+                    channel, 
+                    isLive ? "Live" : "Offline",
+                    isLive ? streamTitle : ""
+                ]).draw().node();
+                row.dataset.channel = channel;
+                row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
+                var checkbox = $(row).find('input[type="checkbox"]');
+                checkbox.prop('checked', isWatching);
+                checkbox.on('change', function() {
+                    _updateDeleteButtonVisibility(selector);
+                });
                 _updateDeleteButtonVisibility(selector);
             });
-            _updateDeleteButtonVisibility(selector);
         });
     });
 }

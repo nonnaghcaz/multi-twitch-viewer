@@ -5,7 +5,7 @@ import { valueInLocalStorage } from "./modules/storage.js";
 import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
-const SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
+const POPUP_CHANNEL_TABLE_SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
 
 document.addEventListener("DOMContentLoaded", function() {
     _onReady();
@@ -15,8 +15,8 @@ async function _handleDeleteSelectedChannels(e) {
     var selectedChannels = getSelectedChannels();
     if (selectedChannels.length > 0) {
         removeChannelsFromStorage(selectedChannels).then(() => {
-            clearTable(SELECTOR);
-            drawTable(SELECTOR);
+            clearTable(POPUP_CHANNEL_TABLE_SELECTOR);
+            drawTable(POPUP_CHANNEL_TABLE_SELECTOR);
         });
     }
 }
@@ -51,13 +51,13 @@ function _handleAddChannels(e) {
 
     }
     addChannelsToStorage(channels).then(() => {
-        clearTable(SELECTOR);
-        drawTable(SELECTOR);
+        clearTable(POPUP_CHANNEL_TABLE_SELECTOR);
+        drawTable(POPUP_CHANNEL_TABLE_SELECTOR);
     });
 }
 
 function _handleWatchChannels(e) {
-    var selectedChannels = getSelectedChannels(SELECTOR);
+    var selectedChannels = getSelectedChannels(POPUP_CHANNEL_TABLE_SELECTOR);
     if (selectedChannels.length > 0) {
         watchChannels(selectedChannels);
     }
@@ -96,7 +96,7 @@ function _onReady() {
             });
         }
     });
-    initTable(SELECTOR);
+    initTable(POPUP_CHANNEL_TABLE_SELECTOR);
 }
 
 function _appendChannelInput(channel) {

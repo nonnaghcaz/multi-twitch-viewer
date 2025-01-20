@@ -56,6 +56,16 @@ function _handleAddChannels(e) {
     });
 }
 
+function _handleThemeSwitch(e) {
+    const htmlelement = document.getElementsByTagName("html")[0];
+    var theme = htmlelement.getAttribute("data-bs-theme");
+    if (theme === "light") {
+        htmlelement.setAttribute("data-bs-theme", "dark");
+    } else {
+        htmlelement.setAttribute("data-bs-theme", "light");
+    }
+}
+
 function _handleWatchChannels(e) {
     var selectedChannels = getSelectedChannels(POPUP_CHANNEL_TABLE_SELECTOR);
     if (selectedChannels.length > 0) {
@@ -69,6 +79,9 @@ function _onReady() {
     const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
     const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
     const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
+    const themeSwitcher = document.getElementById("theme-switcher");
+
+    themeSwitcher.addEventListener("click", _handleThemeSwitch);
 
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);

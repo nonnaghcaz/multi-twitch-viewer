@@ -3,10 +3,14 @@ body {
 }
 
 svg {
-    fill: var(--bs-light);
+    fill: var(--bs-body-color);
 }
 
-.icon {
+.btn-danger svg, .btn-primary svg {
+    fill: var(--bs-btn-color);
+}
+
+th svg, .icon {
     width: 1rem;
     height: 1rem;
 }

@@ -1,7 +1,7 @@
 
 import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
-import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
-import { valueInLocalStorage } from "./modules/storage.js";
+import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_THEME_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
+import { readLocalStorage, valueInLocalStorage, writeLocalStorage } from "./modules/storage.js";
 import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
@@ -56,14 +56,23 @@ function _handleAddChannels(e) {
     });
 }
 
-function _handleThemeSwitch(e) {
+function _toggleLightDarkTheme(e) {
     const htmlelement = document.getElementsByTagName("html")[0];
     var theme = htmlelement.getAttribute("data-bs-theme");
-    if (theme === "light") {
-        htmlelement.setAttribute("data-bs-theme", "dark");
-    } else {
-        htmlelement.setAttribute("data-bs-theme", "light");
-    }
+    var newTheme = theme === "dark" ? "light" : "dark";
+    htmlelement.setAttribute("data-bs-theme", newTheme);
+    _setThemeToStorage(newTheme);
+}
+
+function _setThemeToStorage(theme) {
+    writeLocalStorage(STORAGE_THEME_KEY, theme);
+}
+
+function _setThemeFromStorage() {
+    const htmlelement = document.getElementsByTagName("html")[0];
+    readLocalStorage(STORAGE_THEME_KEY).then((theme) => {
+        htmlelement.setAttribute("data-bs-theme", theme || "dark");
+    });
 }
 
 function _handleWatchChannels(e) {
@@ -74,6 +83,7 @@ function _handleWatchChannels(e) {
 }
 
 function _onReady() {
+    _setThemeFromStorage();
     const addChannelButton = document.getElementById(POPUP_CHANNEL_ADD_BUTTON_ID);
     const submitButton = document.getElementById(POPUP_SUBMIT_BUTTON_ID);
     const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
@@ -81,7 +91,7 @@ function _onReady() {
     const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
     const themeSwitcher = document.getElementById("theme-switcher");
 
-    themeSwitcher.addEventListener("click", _handleThemeSwitch);
+    themeSwitcher.addEventListener("click", _toggleLightDarkTheme);
 
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);

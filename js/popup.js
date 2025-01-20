@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 async function _handleDeleteSelectedChannels(e) {
-    var selectedChannels = getSelectedChannels();
+    var selectedChannels = getSelectedChannels(POPUP_CHANNEL_TABLE_SELECTOR);
     if (selectedChannels.length > 0) {
         removeChannelsFromStorage(selectedChannels).then(() => {
             clearTable(POPUP_CHANNEL_TABLE_SELECTOR);

@@ -98,13 +98,7 @@ function _onThemeRadioChange(e) {
     });
 }
 
-function _onReady() {
-
-    const addChannelButton = document.getElementById(POPUP_CHANNEL_ADD_BUTTON_ID);
-    const submitButton = document.getElementById(POPUP_SUBMIT_BUTTON_ID);
-    const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
-    const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
-    const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
+function _initThemes() {
     const themeName = "theme";
     const themesContainer = document.getElementById("themes-container");
     THEMES.forEach((theme) => {
@@ -133,7 +127,17 @@ function _onReady() {
     themeRadios.forEach((radio) => {
         radio.addEventListener("change", _onThemeRadioChange);
     });
+}
 
+function _onReady() {
+
+    const addChannelButton = document.getElementById(POPUP_CHANNEL_ADD_BUTTON_ID);
+    const submitButton = document.getElementById(POPUP_SUBMIT_BUTTON_ID);
+    const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
+    const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
+    const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
+
+    _initThemes();
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);
     channelInput.addEventListener("input", function() {

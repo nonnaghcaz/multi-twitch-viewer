@@ -109,6 +109,9 @@ function _onReady() {
     isOnTwitchPage().then((isOnTwitch) => {
         if (isOnTwitch) {
             getChannelsFromTabUrl().then((channels) => {
+                if (channels.includes("directory")) {
+                    return;
+                }
                 channels.forEach((channel) => {
                     valueInLocalStorage(STORAGE_CHANNELS_KEY, channel).then((isInStorage) => {
                         if (!isInStorage) {

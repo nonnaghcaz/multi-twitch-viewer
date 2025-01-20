@@ -6,6 +6,7 @@ import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
 const POPUP_CHANNEL_TABLE_SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
+const THEMES = ["dark", "light"];
 
 document.addEventListener("DOMContentLoaded", function() {
     _onReady();
@@ -56,23 +57,30 @@ function _handleAddChannels(e) {
     });
 }
 
-function _toggleLightDarkTheme(e) {
-    const htmlelement = document.getElementsByTagName("html")[0];
-    var theme = htmlelement.getAttribute("data-bs-theme");
-    var newTheme = theme === "dark" ? "light" : "dark";
-    htmlelement.setAttribute("data-bs-theme", newTheme);
-    _setThemeToStorage(newTheme);
+async function writeThemeToStorage(theme) {
+    return writeLocalStorage(STORAGE_THEME_KEY, theme);
 }
 
-function _setThemeToStorage(theme) {
-    writeLocalStorage(STORAGE_THEME_KEY, theme);
+
+async function readThemeFromStorage() {
+    return readLocalStorage(STORAGE_THEME_KEY);
 }
 
 function _setThemeFromStorage() {
-    const htmlelement = document.getElementsByTagName("html")[0];
-    readLocalStorage(STORAGE_THEME_KEY).then((theme) => {
-        htmlelement.setAttribute("data-bs-theme", theme || "dark");
+    readThemeFromStorage().then((theme) => {
+        if (THEMES.includes(theme)) {
+            _setHtmlTheme(theme);
+            const themeRadio = document.getElementById(`theme-${theme}`);
+            if (themeRadio) {
+                themeRadio.checked = true;
+            }
+        }
     });
+}
+
+function _setHtmlTheme(theme) {
+    const htmlelement = document.getElementsByTagName("html")[0];
+    htmlelement.setAttribute("data-bs-theme", theme);
 }
 
 function _handleWatchChannels(e) {
@@ -82,16 +90,49 @@ function _handleWatchChannels(e) {
     }
 }
 
+function _onThemeRadioChange(e) {
+    const theme = e.target.value;
+    console.log("Theme changed to", theme);
+    writeThemeToStorage(theme).then(() => {
+        _setHtmlTheme(theme);
+    });
+}
+
 function _onReady() {
-    _setThemeFromStorage();
+
     const addChannelButton = document.getElementById(POPUP_CHANNEL_ADD_BUTTON_ID);
     const submitButton = document.getElementById(POPUP_SUBMIT_BUTTON_ID);
     const inputError = document.getElementById(POPUP_INPUT_ERROR_ID);
     const channelInput = document.getElementById(POPUP_CHANNEL_INPUT_ID);
     const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
-    const themeSwitcher = document.getElementById("theme-switcher");
+    const themeName = "theme";
+    const themesContainer = document.getElementById("themes-container");
+    THEMES.forEach((theme) => {
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "theme";
+        radio.id = `theme-${theme}`;
+        radio.value = theme;
+        radio.classList.add("btn-check");
+        radio.classList.add("btn-check-dark");
 
-    themeSwitcher.addEventListener("click", _toggleLightDarkTheme);
+        const label = document.createElement("label");
+        label.htmlFor = `theme-${theme}`;
+        label.classList.add("btn");
+        label.classList.add("btn-outline-secondary");
+        label.classList.add("btn-sm");
+        label.innerText = theme;
+
+        themesContainer.appendChild(radio);
+        themesContainer.appendChild(label);
+    });
+
+    _setThemeFromStorage();
+
+    const themeRadios = document.querySelectorAll(`input[name="${themeName}"]`);
+    themeRadios.forEach((radio) => {
+        radio.addEventListener("change", _onThemeRadioChange);
+    });
 
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);

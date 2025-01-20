@@ -14,3 +14,8 @@ th svg, .icon {
     width: 1rem;
     height: 1rem;
 }
+
+.stream-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+}

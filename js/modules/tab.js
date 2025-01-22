@@ -5,17 +5,21 @@ async function getChannelsFromTabUrl() {
     return channels;
 }
 
-async function getTabUrl() {
-    return new Promise((resolve, reject) => {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            if (tabs.length > 0) {
-                resolve(tabs[0].url);
-            } else {
-                reject(new Error("Failed to get tab URL"));
+async function getTabUrl(maxTries=3, retryDelay=100) {
+    for (let i = 0; i < maxTries; i++) {
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab && tab.url) {
+                return tab.url;
             }
-        });
-    });
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed: ${error}`);
+        }
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+    }
+    throw new Error('Failed to get tab URL after maximum retries');
 }
+
 
 async function isOnMultiStreamPage() {
     const url = await getTabUrl();

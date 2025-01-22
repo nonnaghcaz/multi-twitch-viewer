@@ -40,11 +40,14 @@ function initTable(selector) {
                 orderable: false,
                 render: function(data, type, row) {
                     if (type === "display") {
-                        var title = data;
-                        if (data.length > TRUNCATE_TITLE_LENGTH) {
-                            title = data.slice(0, TRUNCATE_TITLE_LENGTH) + "...";
+                        if (!data) {
+                            return "";
                         }
-                        return `<span title="${data}">${title}</span>`;
+                        var text = data;
+                        if (data.length > TRUNCATE_TITLE_LENGTH) {
+                            text = data.slice(0, TRUNCATE_TITLE_LENGTH) + "...";
+                        }
+                        return `<span title="${data}">${text}</span>`;
                     }
                     return data;
                 }

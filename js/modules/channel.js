@@ -13,6 +13,29 @@ async function isChannelLive(channel) {
     });
 }
 
+async function isChannelLiveWithRetries(channel, maxTries=3, retryDelay=100) {
+    if (maxTries < 1) {
+        throw new Error("maxTries must be greater than or equal to 1");
+    }
+    if (retryDelay < 0) {
+        throw new Error("retryDelay must be greater than or equal to 0");
+    }
+    for (let attempt = 1; attempt <= maxTries; attempt++) {
+        try {
+            const isLive = await isChannelLive(channel);
+            if (isLive) {
+                return true;
+            }
+        } catch (error) {
+            if (attempt === maxTries) {
+                console.error(`Failed to check if channel is live for ${channel} after ${maxTries} attempts: ${error}`);
+            }
+        }
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+    }
+    return false;
+}
+
 async function getStreamTitle(channel) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({contentScriptQuery: "getStreamTitle", channel: channel}, function(response) {
@@ -92,5 +115,5 @@ async function removeChannelsFromStorage(channels) {
     await writeLocalStorage(STORAGE_CHANNELS_KEY, storedChannels);
 }
 
-export { addChannelsToStorage, addChannelToStorage, getStoredChannels, getStreamTitle, getStreamTitleWithRetries, isChannelLive, removeChannelFromStorage, removeChannelsFromStorage };
+export { addChannelsToStorage, addChannelToStorage, getStoredChannels, getStreamTitle, getStreamTitleWithRetries, isChannelLive, isChannelLiveWithRetries, removeChannelFromStorage, removeChannelsFromStorage };
 

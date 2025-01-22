@@ -268,7 +268,7 @@ function getSelectedRows(selector, asArray=false) {
 
 function getSelectedChannels(selector) {
     var selectedRows = getSelectedRows(selector, true);
-    return selectedRows.map((row) => row[1]);
+    return selectedRows.map((row) => row.channel);
 }
 
 function getLiveChannels(selector) {

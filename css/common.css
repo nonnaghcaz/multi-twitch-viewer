@@ -1,5 +1,5 @@
 body {
-    font: 1rem 'Roboto', sans-serif;
+    font: 1rem 'Roboto', monospace;
 }
 
 svg {
@@ -10,12 +10,7 @@ svg {
     fill: var(--bs-btn-color);
 }
 
-th svg, .icon {
+th svg, .btn svg, .icon {
     width: 1rem;
     height: 1rem;
-}
-
-.stream-title {
-    font-size: 0.75rem;
-    font-weight: 500;
 }

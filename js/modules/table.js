@@ -2,12 +2,17 @@ import { getChannelData } from "./channel.js";
 import { STORAGE_CHANNELS_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_TRUNCATE_LENGTH } from "./constants.js";
 import { readLocalStorage } from "./storage.js";
 
+function truncateText(text, length) {
+    return text.length > length ? text.slice(0, length) + "..." : text;
+}
+
 function initTable(selector) {
 
     DataTable.Buttons.defaults.dom.button.className = 'btn';
     var table = $(selector).DataTable({
         dom: "Bft",
         paging: false,
+        autoWidth: false,
         columns: [
             {
                 data: "selection",
@@ -15,10 +20,11 @@ function initTable(selector) {
                 orderable: true,
                 searchable: false,
                 type: "checkbox",
-                className: "channel-checkbox text-center",
+                className: "channel-checkbox",
                 render: function(data, type, row) {
                     return `<input type='checkbox' name='channel-select' ${data ? 'checked' : ''}>`;
-                }
+                },
+                width: "10%",
             },
             {
                 data: "channel",
@@ -26,18 +32,27 @@ function initTable(selector) {
                 orderable: true,
                 searchable: true,
                 render: function(data, type, row) {
-                    return `<a href="https://twitch.tv/${data}" target="_blank">${data}</a>`;
-                }
+                    if (type === "display") {
+
+                        return `<a title="${data}" class="stream-link" href="https://www.twitch.tv/${data}" target="_blank">${truncateText(data, 10)}</a>`;
+                    }
+                    return data;
+                },
+                width: "30%"
             },
             {
                 data: "isLive",
                 title: TABLE_HEADER_STREAM_ISLIVE,
                 orderable: true,
                 searchable: false,
-                className: "text-center",
                 render: function(data, type, row) {
-                    return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
-                }
+                    // return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
+                    if (type === "display") {
+                        return data === 1 ? '<span class="badge bg-success">Live</span>' : `<span class="badge bg-danger">Off</span>`;
+                    }
+                    return data;
+                },
+                width: "10%"
             },
             {
                 data: "streamTitle",
@@ -49,19 +64,19 @@ function initTable(selector) {
                         if (!data) {
                             return "";
                         }
-                        var _text = data.length > TABLE_TRUNCATE_LENGTH ? data.slice(0, TABLE_TRUNCATE_LENGTH) + "...": data;
-                        return `<span title="${data}">${_text}</span>`;
+                        return `<span title="${data}" class="stream-title">${truncateText(data, TABLE_TRUNCATE_LENGTH)}</span>`;
                     }
                     return data;
-                }
+                },
+                width: "50%"
             }
         ],
         columnDefs: [
             { className: "dt-head-center", targets: [ 0, 1, 2, 3] },
-            { className: "stream-title", targets: [3] },
+            { className: "dt-body-center", targets: [ 0, 2] }
         ],
         scrollY: "300px",
-        order: [[0, "desc"], [2, "asc"], [1, "asc"]],
+        order: [[0, "desc"], [2, "desc"], [1, "asc"]],
         buttons: [
             {
                 title: "Refresh Table",
@@ -189,23 +204,14 @@ function _updateDeleteButtonVisibility(selector) {
     deleteButton.style.display = anyChecked ? "block" : "none";
 }
 
-function selectChannels(selector, channels) {
-    var table = getTable(selector);
-    var rows = table.rows().nodes();
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        var channel = row.dataset.channel;
-        var checkbox = row.querySelector(".channel-checkbox");
-        checkbox.checked = channels.includes(channel);
-    }
-}
-
 function drawTable(selector) {
+    var table = getTable(selector);
     readLocalStorage(STORAGE_CHANNELS_KEY).then((channels) => {
         channels.forEach((channel) => {
             addRow(selector, channel);
         });
     });
+    table.columns.adjust().draw();
 }
 
 function clearTable(selector) {
@@ -223,7 +229,7 @@ function addRow(selector, channel) {
         var row = table.row.add({
             selection: isWatching ? 1 : 0, 
             channel: channel,
-            isLive: isLive ? "Live" : "Offline",
+            isLive: isLive ? 1 : 0,
             streamTitle: streamTitle
         }).draw().node();
         if (!row) {

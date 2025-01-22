@@ -1,34 +1,26 @@
-
-
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-        if (request.contentScriptQuery == "checkIfLive") {
+        if (request.contentScriptQuery == "getTwitchResponse") {
             var channel = request.channel;
-            fetch(`https://twitch.tv/${channel}`)
-                .then(response => response.text())
-                .then(text => {
-                    var isLive = text.includes("isLiveBroadcast");
-                    var _text = isLive ? "is" : "is not";
-                    sendResponse({isLive: isLive});
-                }).catch(error => {
-                    console.error(`Error fetching channel ${channel}: ${error}`);
-                    sendResponse({isLive: null});
-                });
-            return true;
-        }
-        if (request.contentScriptQuery == "getStreamTitle") {
-            var channel = request.channel;
-            fetch(`https://twitch.tv/${channel}`)
-                .then(response => response.text())
-                .then(text => {
-                    var descriptionMatch = text.match(/<meta[^>]*name=.*["']description["'][^>]*content=["']([^"']*)["'][^>]*>/);
-                    
-                    var description = descriptionMatch ? descriptionMatch[1] : null;
-                    sendResponse({streamTitle: description});
-                }).catch(error => {
-                    console.error(`Error fetching channel ${channel}: ${error}`);
-                    sendResponse({streamTitle: null});
-                });
+            var maxTries = request.maxTries || 3;
+            var retryDelay = request.retryDelay || 100;
+
+            function fetchWithRetry(triesLeft) {
+                fetch(`https://twitch.tv/${channel}`)
+                    .then(response => response.text())
+                    .then(text => {
+                        sendResponse({text: text});
+                    }).catch(error => {
+                        if (triesLeft > 1) {
+                            setTimeout(() => fetchWithRetry(triesLeft - 1), retryDelay);
+                        } else {
+                            console.error(`Error fetching channel ${channel}: ${error}`);
+                            sendResponse({text: null});
+                        }
+                    });
+            }
+
+            fetchWithRetry(maxTries);
             return true;
         }
     }

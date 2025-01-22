@@ -1,75 +1,51 @@
 import { STORAGE_CHANNELS_KEY } from "./constants.js";
+import { getElementByXpath } from "./dom.js";
 import { readLocalStorage, writeLocalStorage } from "./storage.js";
+import { isWatchingChannel } from "./tab.js";
 
-async function isChannelLive(channel) {
+
+
+async function getChannelData(channel, maxTries=3, retryDelay=100) {
+    const text = await getTwitchResponse(channel, maxTries, retryDelay);
+    const doc = new DOMParser().parseFromString(text, "text/html");
+    const isWatching = await isWatchingChannel(channel);
+    const isLive = _isLive(doc);
+    var data = { channel, isLive, isWatching, streamTitle: null };
+    if (isLive) {
+        const streamTitle = _getStreamTitleFromResponse(doc);
+        if (!streamTitle) {
+            console.error("Failed to get stream title from text", doc);
+        }
+        data.streamTitle = streamTitle;
+    }
+
+    return data;
+}
+
+async function getTwitchResponse(channel, maxTries=3, retryDelay=100) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({contentScriptQuery: "checkIfLive", channel: channel}, function(response) {
+        chrome.runtime.sendMessage({contentScriptQuery: "getTwitchResponse", channel: channel, maxTries: maxTries, retryDelay: retryDelay}, function(response) {
             if (response) {
-                resolve(response.isLive);
+                resolve(response.text);
             } else {
-                reject(new Error("Failed to check if channel is live"));
+                reject(new Error("Failed to get Twitch response"));
             }
         });
     });
 }
 
-async function isChannelLiveWithRetries(channel, maxTries=3, retryDelay=100) {
-    if (maxTries < 1) {
-        throw new Error("maxTries must be greater than or equal to 1");
-    }
-    if (retryDelay < 0) {
-        throw new Error("retryDelay must be greater than or equal to 0");
-    }
-    for (let attempt = 1; attempt <= maxTries; attempt++) {
-        try {
-            const isLive = await isChannelLive(channel);
-            if (isLive) {
-                return true;
-            }
-        } catch (error) {
-            if (attempt === maxTries) {
-                console.error(`Failed to check if channel is live for ${channel} after ${maxTries} attempts: ${error}`);
-            }
-        }
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
-    }
-    return false;
+async function getStreamTitle(channel, maxTries=3, retryDelay=100) {
+    const text = await getTwitchResponse(channel, maxTries, retryDelay);
+    return _getStreamTitleFromResponse(text);
 }
 
-async function getStreamTitle(channel) {
-    return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({contentScriptQuery: "getStreamTitle", channel: channel}, function(response) {
-            if (response) {
-                resolve(response.streamTitle);
-            } else {
-                reject(new Error("Failed to get stream title"));
-            }
-        });
-    });
+
+
+async function isChannelLive(channel, maxTries=3, retryDelay=100) {
+    const text = await getTwitchResponse(channel, maxTries, retryDelay);
+    return _isLive(text);
 }
 
-async function getStreamTitleWithRetries(channel, maxTries=3, retryDelay=100) {
-    if (maxTries < 1) {
-        throw new Error("maxTries must be greater than or equal to 1");
-    }
-    if (retryDelay < 0) {
-        throw new Error("retryDelay must be greater than or equal to 0");
-    }
-    for (let attempt = 1; attempt <= maxTries; attempt++) {
-        try {
-            const streamTitle = await getStreamTitle(channel);
-            if (streamTitle) {
-                return streamTitle;
-            }
-        } catch (error) {
-            if (attempt === maxTries) {
-                console.error(`Failed to get stream title for ${channel} after ${maxTries} attempts: ${error}`);
-            }
-        }
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
-    }
-    return null;
-}
 
 async function getStoredChannels() {
     return await readLocalStorage(STORAGE_CHANNELS_KEY);
@@ -115,5 +91,17 @@ async function removeChannelsFromStorage(channels) {
     await writeLocalStorage(STORAGE_CHANNELS_KEY, storedChannels);
 }
 
-export { addChannelsToStorage, addChannelToStorage, getStoredChannels, getStreamTitle, getStreamTitleWithRetries, isChannelLive, isChannelLiveWithRetries, removeChannelFromStorage, removeChannelsFromStorage };
+function _getStreamTitleFromResponse(doc) {
+    // Parse the meta:description tag from the response
+    const xpath = "//meta[contains(@name, 'description')]";
+    const metaDescription = getElementByXpath(xpath, doc);
+    return metaDescription ? metaDescription.getAttribute("content") : null;
+}
+
+function _isLive(doc) {
+    var text = doc.head.innerHTML;
+    return text.includes("isLiveBroadcast");
+}
+
+export { addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, isChannelLive, removeChannelFromStorage, removeChannelsFromStorage };
 

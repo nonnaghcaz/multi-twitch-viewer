@@ -1,4 +1,4 @@
-import { getStreamTitle, isChannelLiveWithRetries } from "./channel.js";
+import { getChannelData } from "./channel.js";
 import { STORAGE_CHANNELS_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_TRUNCATE_LENGTH } from "./constants.js";
 import { readLocalStorage } from "./storage.js";
 
@@ -215,29 +215,36 @@ function clearTable(selector) {
 
 function addRow(selector, channel) {
     var table = getTable(selector);
-    isChannelLiveWithRetries(channel).then((isLive) => {
-        isWatchingChannel(channel).then((isWatching) => {
-            getStreamTitle(channel).then((streamTitle) => {
-                var row = table.row.add([
-                    isWatching ? 1 : 0, 
-                    channel, 
-                    isLive ? "Live" : "Offline",
-                    isLive ? streamTitle : ""
-                ]).draw().node();
-                row.dataset.channel = channel;
-                row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
-                var checkbox = $(row).find('input[type="checkbox"]');
-                checkbox.prop('checked', isWatching);
-                checkbox.on('change', function() {
-                    _updateDeleteButtonVisibility(selector);
-                });
-                _updateDeleteButtonVisibility(selector);
-            }).catch((error) => {
-                console.error(`Failed to get stream title for ${channel}: ${error}`);
-            });
+    getChannelData(channel).then((data) => {
+        var isLive = data.isLive;
+        var streamTitle = data.streamTitle;
+        var isWatching = data.isWatching;
+        var channel = data.channel;
+        var row = table.row.add({
+            selection: isWatching ? 1 : 0, 
+            channel: channel,
+            isLive: isLive ? "Live" : "Offline",
+            streamTitle: streamTitle
+        }).draw().node();
+        if (!row) {
+            console.error("Failed to add row to table", JSON.stringify(data));
+            return;
+        }
+        row.dataset.channel = channel;
+        row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
+        row.dataset.streamTitle = streamTitle;
+        row.dataset.isWatching = isWatching ? TABLE_DATASET_TRUE : TABLE_DATASET_FALSE;
+        var checkbox = $(row).find('input[type="checkbox"]');
+        checkbox.prop('checked', isWatching);
+        checkbox.on('change', function() {
+            _updateDeleteButtonVisibility(selector);
         });
+        _updateDeleteButtonVisibility(selector);
+    }).catch((error) => {
+        console.error(`Failed to get channel data for ${channel}: ${error}`);
     });
 }
+
 
 function getTable(selector) {
     // Return existing DataTable instance

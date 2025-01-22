@@ -43,11 +43,8 @@ function initTable(selector) {
                         if (!data) {
                             return "";
                         }
-                        var text = data;
-                        if (data.length > TRUNCATE_TITLE_LENGTH) {
-                            text = data.slice(0, TRUNCATE_TITLE_LENGTH) + "...";
-                        }
-                        return `<span title="${data}">${text}</span>`;
+                        var _text = data.length > TRUNCATE_TITLE_LENGTH ? data.slice(0, TRUNCATE_TITLE_LENGTH) + "...": data;
+                        return `<span title="${data}">${_text}</span>`;
                     }
                     return data;
                 }

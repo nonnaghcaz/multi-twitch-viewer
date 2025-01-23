@@ -4,12 +4,17 @@ chrome.runtime.onMessage.addListener(
             var channel = request.channel;
             var maxTries = request.maxTries || 3;
             var retryDelay = request.retryDelay || 100;
+            var tryUntilLive = request.tryUntilLive || false;
 
             function fetchWithRetry(triesLeft) {
                 fetch(`https://twitch.tv/${channel}`)
                     .then(response => response.text())
                     .then(text => {
-                        sendResponse({text: text});
+                        if (tryUntilLive && !text.includes("isLiveBroadcast") && triesLeft > 1) {
+                            setTimeout(() => fetchWithRetry(triesLeft - 1), retryDelay);
+                        } else {
+                            sendResponse({text: text});
+                        }
                     }).catch(error => {
                         if (triesLeft > 1) {
                             setTimeout(() => fetchWithRetry(triesLeft - 1), retryDelay);

@@ -24,7 +24,7 @@ async function getChannelData(channel, maxTries=3, retryDelay=100) {
 
 async function getTwitchResponse(channel, maxTries=3, retryDelay=100) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({contentScriptQuery: "getTwitchResponse", channel: channel, maxTries: maxTries, retryDelay: retryDelay}, function(response) {
+        chrome.runtime.sendMessage({contentScriptQuery: "getTwitchResponse", channel: channel, maxTries: maxTries, retryDelay: retryDelay, tryUntilLive: true}, function(response) {
             if (response) {
                 resolve(response.text);
             } else {

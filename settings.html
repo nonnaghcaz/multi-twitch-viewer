@@ -13,13 +13,57 @@
         <hr>
         <p>Multi Twitch Viewer is a simple MV3 Chrome extension designed to easily allow keeping track of, creating MultiStre.am links for, and simultaneously watching your favorite Twitch streamers.</p>
         <hr>
+        <div class="accordion" id="settings-accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="edit-channels-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#edit-channel-item" aria-expanded="false" aria-controls="edit-channel-item">
+                        Channels
+                    </button>
+                </h2>
+                <div id="edit-channel-item" class="accordion-collapse collapse" aria-labelledby="edit-channels-header" data-bs-parent="#settings-accordion">
+                    <div class="accordion-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter Twitch Channel(s)" id="add-channel-input">
+                            <button class="btn btn-primary" type="button" id="add-channel-button">Add</button>
+                        </div>
+                        <small id="add-channel-help" class="form-text">Separate multiple channels with commas</small>
+                        <small id="add-channel-error" class="invalid-feedback" style="display: none;"></small>
+
+                        <hr>
+                        <div id="channels-container"></div>
+                        <hr>
+                        <div class="btn-group" role="group" aria-label="Channel Edit Buttons" id="channel-edit-buttons">
+                            <button id="save-channel-changes" class="btn btn-primary">Save Changes</button>
+                            <button id="delete-selected-channels" class="btn btn-danger">Delete Selected</button>
+                            <!-- <button id="delete-all-channels" class="btn btn-danger">Delete All</button> -->
+                            <button id="cancel-channel-edits" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="edit-links-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#edit-links-item" aria-expanded="false" aria-controls="edit-links-item">
+                        Links
+                    </button>
+                </h2>
+                <div id="edit-links-item" class="accordion-collapse collapse" aria-labelledby="edit-links-header" data-bs-parent="#settings-accordion">
+                    <div class="accordion-body">
+                        <p class="text-warning">Under construction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="js/settings.js" type="module"></script>
 </body>
 <footer>
-    <div class="container">
+
+    <div class="container pb-2 ps-2 pe-2">
+        <hr> 
         <div class="d-flex flex-column justify-content-center align-items-center">
-            <p>No affiliation with Twitch or MultiStre.am.</p>
+            <p>No affiliation with Twitch.tv or MultiStre.am.</p>
             <a href="https://github.com/nonnaghcaz/multi-twitch-viewer" target="_blank">GitHub repo</a>
         </div>
     </div>

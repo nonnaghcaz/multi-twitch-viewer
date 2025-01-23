@@ -64,7 +64,7 @@ function initTable(selector) {
                         if (!data) {
                             return "";
                         }
-                        return `<span title="${data}" class="stream-title">${truncateText(data, TABLE_TRUNCATE_LENGTH)}</span>`;
+                        return `<span title="${data.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" class="stream-title">${truncateText(data, TABLE_TRUNCATE_LENGTH)}</span>`;
                     }
                     return data;
                 },

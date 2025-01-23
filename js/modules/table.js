@@ -1,5 +1,5 @@
 import { getChannelData } from "./channel.js";
-import { STORAGE_CHANNELS_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_TRUNCATE_LENGTH } from "./constants.js";
+import { FA_CIRCLE_CHECK, FA_CIRCLE_XMARK, STORAGE_CHANNELS_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_TRUNCATE_LENGTH } from "./constants.js";
 import { readLocalStorage } from "./storage.js";
 
 function truncateText(text, length) {
@@ -48,7 +48,24 @@ function initTable(selector) {
                 render: function(data, type, row) {
                     // return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
                     if (type === "display") {
-                        return data === 1 ? '<span class="badge bg-success">Live</span>' : `<span class="badge bg-danger">Off</span>`;
+                        var _p = new DOMParser()
+                        var _span = document.createElement("span");
+                        var _checkSvg = _p.parseFromString(FA_CIRCLE_CHECK, "image/svg+xml").documentElement;
+                        _checkSvg.classList.add("icon");
+                        var _xmarkSvg = _p.parseFromString(FA_CIRCLE_XMARK, "image/svg+xml").documentElement;
+                        _xmarkSvg.classList.add("icon");
+                        _span.classList.add("badge");
+                        if (data == 1) {
+                            _span.classList.add("bg-success");
+                            _span.title = "Live";
+                            _span.appendChild(_checkSvg);
+                        } else {
+                            _span.classList.add("bg-danger");
+                            _span.title = "Offline";
+                            _span.appendChild(_xmarkSvg);
+                        }
+                        
+                        return _span.outerHTML;
                     }
                     return data;
                 },

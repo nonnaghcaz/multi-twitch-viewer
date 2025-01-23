@@ -3,7 +3,7 @@ chrome.runtime.onMessage.addListener(
         if (request.contentScriptQuery == "getTwitchResponse") {
             var channel = request.channel;
             var maxTries = request.maxTries || 3;
-            var retryDelay = request.retryDelay || 100;
+            var retryDelay = request.retryDelay || 1000;
             var tryUntilLive = request.tryUntilLive || false;
 
             function fetchWithRetry(triesLeft) {

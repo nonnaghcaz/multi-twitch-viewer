@@ -45,8 +45,21 @@ const TABLE_BUTTON_SELECT_ALL = `<span title="Select All Channels"><input type="
 const TABLE_BUTTON_SELECT_LIVE = `<span title="Select Live Channels"><input type="checkbox" id="select-live"> Live</span>`
 const TABLE_BUTTON_SELECT_CLEAR = `<span title="Clear Selected Channels">${FA_BROOM}</span>`
 
+// channel.js
+
+const CHANNEL_AUTHOR_PICKS = ["imbladee_", "ittszach", "spaceboy", "sput", "halfwayhardcore", "mikethebard"];
+
+// links.js
+
+const LINKS_AUTHOR_PICKS = [
+    { name: "Twitch Directory", url: "https://www.twitch.tv/directory/" },
+    { name: "Twitch Following", url: "https://www.twitch.tv/directory/following/" },
+    { name: "MultiStre.am", url: "https://multistre.am/" },
+    { name: "GitHub Repo", url: "https://github.com/nonnaghcaz/multi-twitch-viewer" }
+]
+
 export {
-    FA_BROOM, FA_CIRCLE_CHECK, FA_CIRCLE_INFO, FA_CIRCLE_XMARK, FA_LINK, FA_LINK_SLASH, FA_ROTATE, FA_SIGNAL, FA_SQUARE_CHECK, FA_TV, POPUP_CHANNEL_ADD_BUTTON_ID,
+    CHANNEL_AUTHOR_PICKS, FA_BROOM, FA_CIRCLE_CHECK, FA_CIRCLE_INFO, FA_CIRCLE_XMARK, FA_LINK, FA_LINK_SLASH, FA_ROTATE, FA_SIGNAL, FA_SQUARE_CHECK, FA_TV, LINKS_AUTHOR_PICKS, POPUP_CHANNEL_ADD_BUTTON_ID,
     POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID,
     POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY, STORAGE_THEME_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_CHANNEL, TABLE_DATASET_FALSE, TABLE_DATASET_IS_LIVE,
     TABLE_DATASET_TRUE, TABLE_DELETE_BUTTON_ID, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_REFRESH_BUTTON_ID,

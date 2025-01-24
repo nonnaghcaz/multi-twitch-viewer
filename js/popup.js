@@ -1,6 +1,7 @@
 
 import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
 import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY, STORAGE_THEME_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
+import { addAuthorLinksToStorage } from "./modules/links.js";
 import { readLocalStorage, valueInLocalStorage, writeLocalStorage } from "./modules/storage.js";
 import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
@@ -24,7 +25,7 @@ async function _handleDeleteSelectedChannels(e) {
 
 async function _initLinks() {
     const links = await readLocalStorage(STORAGE_LINKS_KEY);
-    if (links) {
+    if (links.length > 0) {
         const linksContainer = document.getElementById("links-container");
         links.forEach((link) => {
             const li = document.createElement("li");
@@ -36,6 +37,8 @@ async function _initLinks() {
             li.appendChild(a);
             linksContainer.appendChild(li);
         });
+    } else {
+        addAuthorLinksToStorage().then(() => _initLinks());
     }
 }
 

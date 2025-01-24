@@ -1,4 +1,4 @@
-import { STORAGE_CHANNELS_KEY, TWITCH_DEFAULT_MAX_TRIES, TWITCH_DEFAULT_RETRY_DELAY, TWITCH_STREAM_ISLIVE_TEXT, TWITCH_STREAM_ISLIVE_XPATH, TWITCH_STREAM_TITLE_ATTRIBUTE, TWITCH_STREAM_TITLE_XPATH } from "./constants.js";
+import { CHANNEL_AUTHOR_PICKS, STORAGE_CHANNELS_KEY, TWITCH_DEFAULT_MAX_TRIES, TWITCH_DEFAULT_RETRY_DELAY, TWITCH_STREAM_ISLIVE_TEXT, TWITCH_STREAM_ISLIVE_XPATH, TWITCH_STREAM_TITLE_ATTRIBUTE, TWITCH_STREAM_TITLE_XPATH } from "./constants.js";
 import { getElementByXpath } from "./dom.js";
 import { readLocalStorage, writeLocalStorage } from "./storage.js";
 import { isWatchingChannel } from "./tab.js";
@@ -63,6 +63,11 @@ function _isChannelLiveFromResponse(doc) {
 // Storage functions
 // -------------------------------------------------------------------------------------
 
+async function addAuthorChannelsToStorage() {
+    var channels = CHANNEL_AUTHOR_PICKS;
+    addChannelsToStorage(channels);
+}
+
 async function getStoredChannels() {
     return await readLocalStorage(STORAGE_CHANNELS_KEY);
 }
@@ -96,5 +101,5 @@ async function removeChannelsFromStorage(channels) {
 }
 
 
-export { addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, isChannelLive, removeChannelFromStorage, removeChannelsFromStorage };
+export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, isChannelLive, removeChannelFromStorage, removeChannelsFromStorage };
 

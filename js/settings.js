@@ -1,5 +1,6 @@
-import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
+import { addAuthorChannelsToStorage, addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
 import { STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY } from "./modules/constants.js";
+import { addAuthorLinksToStorage, removeLinksFromStorage } from "./modules/links.js";
 import { readLocalStorage, writeLocalStorage } from "./modules/storage.js";
 
 document.addEventListener("DOMContentLoaded", _onReady);
@@ -9,26 +10,6 @@ function _onReady() {
     _initLinks();
 }
 
-// Channels
-
-function _addAuthorChannels() {
-    var channels = ["imbladee_", "ittszach", "spaceboy", "sput", "halfwayhardcore", "mikethebard"];
-    addChannelsToStorage(channels).then(() => {
-        _createChannelsList();
-    });
-}
-
-function _addAuthorLinks() {
-    var links = [
-        { name: "Twitch Directory", url: "https://www.twitch.tv/directory/" },
-        { name: "Twitch Following", url: "https://www.twitch.tv/directory/following/" },
-        { name: "MultiStre.am", url: "https://multistre.am/" },
-        { name: "GitHub Repo", url: "https://github.com/nonnaghcaz/multi-twitch-viewer" }
-    ];
-    addLinksToStorage(links).then(() => {
-        _createLinksList();
-    });
-}
 
 function _initChannels() {
     var saveChannelEditsButton = document.getElementById("save-channel-changes");
@@ -42,8 +23,14 @@ function _initChannels() {
     deleteSelectedChannelsButton.addEventListener("click", _handleDeleteChannels);
     cancelChannelEditsButton.addEventListener("click", _handleCancelChannelEdits);
     addChannelButton.addEventListener("click", _handleAddChannels);
-    loadRecommendedChannelsButton.addEventListener("click", _addAuthorChannels);
+    loadRecommendedChannelsButton.addEventListener("click", _handleAddAuthorChannels);
     _updateChannelEditButtonVisibilities();
+}
+
+function _handleAddAuthorChannels(e) {
+    addAuthorChannelsToStorage().then(() => {
+        _createChannelsList();
+    });
 }
 
 function _createChannelsList() {
@@ -214,8 +201,14 @@ function _initLinks() {
     deleteSelectedLinksButton.addEventListener("click", _handleDeleteLinks);
     cancelLinkEditsButton.addEventListener("click", _handleCancelLinkEdits);
     addLinkButton.addEventListener("click", _handleAddLink);
-    loadRecommendedLinksButton.addEventListener("click", _addAuthorLinks);
+    loadRecommendedLinksButton.addEventListener("click", _handleAddAuthorLinks);
     _updateLinkButtonVisibilities();
+}
+
+function _handleAddAuthorLinks(e) {
+    addAuthorLinksToStorage().then(() => {
+        _createLinksList();
+    });
 }
 
 function _handleAddLink(e) {
@@ -243,26 +236,6 @@ function _handleAddLink(e) {
     addLinksToStorage(links).then(() => {
         _createLinksList();
     });
-}
-
-async function addLinksToStorage(links) {
-    var storedLinks = await readLocalStorage(STORAGE_LINKS_KEY);
-    for (var i = 0; i < links.length; i++) {
-        var link = links[i];
-        if (!storedLinks.some((storedLink) => storedLink.name === link.name)) {
-            storedLinks.push(link);
-        }
-    }
-    await writeLocalStorage(STORAGE_LINKS_KEY, storedLinks);
-}
-
-async function removeLinksFromStorage(links) {
-    var storedLinks = await readLocalStorage(STORAGE_LINKS_KEY);
-    for (var i = 0; i < links.length; i++) {
-        var link = links[i];
-        storedLinks = storedLinks.filter((storedLink) => storedLink.name !== link.name);
-    }
-    await writeLocalStorage(STORAGE_LINKS_KEY, storedLinks);
 }
 
 function _createLinksList() {

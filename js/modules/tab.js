@@ -1,7 +1,22 @@
 async function getChannelsFromTabUrl() {
+    const bannedChannels = ["layout", "multistre.am", "twitch.tv", "https://", "http://", "directory", "following", "search", "explore", "clips", "videos", "about", "schedule", "clips", "videos", "about", "schedule"];
+    const whitelistHostnames = ["multistre.am", "twitch.tv", "www.twitch.tv"];
     const url = await getTabUrl();
+    if (url.length === 0) {
+        return [];
+    }
+
     const urlObj = new URL(url);
-    var channels = urlObj.pathname.split("/").filter((part) => part.length > 0);
+    if (!whitelistHostnames.includes(urlObj.hostname)) {
+        return [];
+    }
+
+    function isBanned(part) {
+        return bannedChannels.some(b => part.includes(b));
+    }
+    var urlSplit = urlObj.pathname.split("/");
+
+    var channels = urlSplit.filter((part) => part.length > 0 && !isBanned(part));
     return channels;
 }
 

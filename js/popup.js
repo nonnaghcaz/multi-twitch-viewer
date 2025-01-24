@@ -3,7 +3,7 @@ import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/chann
 import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY, STORAGE_THEME_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
 import { addAuthorLinksToStorage } from "./modules/links.js";
 import { readLocalStorage, valueInLocalStorage, writeLocalStorage } from "./modules/storage.js";
-import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
+import { getChannelsFromTabUrl, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
 
 const POPUP_CHANNEL_TABLE_SELECTOR = `#${POPUP_CHANNEL_TABLE_ID}`;
@@ -172,22 +172,16 @@ function _onReady() {
 
     deleteButton.addEventListener("click", _handleDeleteSelectedChannels);
 
-    isOnTwitchPage().then((isOnTwitch) => {
-        if (isOnTwitch) {
-            getChannelsFromTabUrl().then((channels) => {
-                if (channels.includes("directory")) {
-                    return;
+    getChannelsFromTabUrl().then((channels) => {
+        channels.forEach((channel) => {
+            valueInLocalStorage(STORAGE_CHANNELS_KEY, channel).then((isInStorage) => {
+                if (!isInStorage) {
+                    _appendChannelInput(channel);
                 }
-                channels.forEach((channel) => {
-                    valueInLocalStorage(STORAGE_CHANNELS_KEY, channel).then((isInStorage) => {
-                        if (!isInStorage) {
-                            _appendChannelInput(channel);
-                        }
-                    });
-                });
             });
-        }
+        });
     });
+
     initTable(POPUP_CHANNEL_TABLE_SELECTOR);
 }
 

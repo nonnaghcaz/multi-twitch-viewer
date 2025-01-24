@@ -1,6 +1,6 @@
 
 import { addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
-import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_THEME_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
+import { POPUP_CHANNEL_ADD_BUTTON_ID, POPUP_CHANNEL_INPUT_ID, POPUP_CHANNEL_TABLE_ID, POPUP_INPUT_ERROR_ID, POPUP_SUBMIT_BUTTON_ID, STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY, STORAGE_THEME_KEY, TABLE_DELETE_BUTTON_ID } from "./modules/constants.js";
 import { readLocalStorage, valueInLocalStorage, writeLocalStorage } from "./modules/storage.js";
 import { getChannelsFromTabUrl, isOnTwitchPage, watchChannels } from "./modules/tab.js";
 import { clearTable, drawTable, getSelectedChannels, initTable } from "./modules/table.js";
@@ -18,6 +18,23 @@ async function _handleDeleteSelectedChannels(e) {
         removeChannelsFromStorage(selectedChannels).then(() => {
             clearTable(POPUP_CHANNEL_TABLE_SELECTOR);
             drawTable(POPUP_CHANNEL_TABLE_SELECTOR);
+        });
+    }
+}
+
+async function _initLinks() {
+    const links = await readLocalStorage(STORAGE_LINKS_KEY);
+    if (links) {
+        const linksContainer = document.getElementById("links-container");
+        links.forEach((link) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.className = "dropdown-item";
+            a.href = link.url;
+            a.target = "_blank";
+            a.innerText = link.name;
+            li.appendChild(a);
+            linksContainer.appendChild(li);
         });
     }
 }
@@ -138,6 +155,7 @@ function _onReady() {
     const deleteButton = document.getElementById(TABLE_DELETE_BUTTON_ID);
 
     _initThemes();
+    _initLinks();
     submitButton.addEventListener("click", _handleWatchChannels);
     addChannelButton.addEventListener("click", _handleAddChannels);
     channelInput.addEventListener("input", function() {

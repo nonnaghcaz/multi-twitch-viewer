@@ -22,6 +22,8 @@
                 </h2>
                 <div id="edit-channel-item" class="accordion-collapse collapse" aria-labelledby="edit-channels-header" data-bs-parent="#settings-accordion">
                     <div class="accordion-body">
+                        <button id="load-recommended-channels" class="btn btn-primary">Load Zach's Picks</button>
+                        <hr>
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Enter Twitch Channel(s)" id="add-channel-input">
                             <button class="btn btn-primary" type="button" id="add-channel-button">Add</button>
@@ -49,7 +51,24 @@
                 </h2>
                 <div id="edit-links-item" class="accordion-collapse collapse" aria-labelledby="edit-links-header" data-bs-parent="#settings-accordion">
                     <div class="accordion-body">
-                        <p class="text-warning">Under construction.</p>
+                        <button id="load-recommended-links" class="btn btn-primary">Load Zach's Picks</button>
+                        <hr>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter Link Name" id="add-link-name-input">
+                            <input type="text" class="form-control" placeholder="Enter Link URL" id="add-link-url-input">
+                            <button class="btn btn-primary" type="button" id="add-link-button">Add</button>
+                        </div>
+                        <small id="add-link-error" class="invalid-feedback" style="display: none;"></small>
+
+                        <hr>
+                        <div id="links-container"></div>
+                        <hr>
+                        <div class="btn-group" role="group" aria-label="Link Edit Buttons" id="link-edit-buttons">
+                            <button id="save-link-changes" class="btn btn-primary">Save Changes</button>
+                            <button id="delete-selected-links" class="btn btn-danger">Delete Selected</button>
+                            <!-- <button id="delete-all-links" class="btn btn-danger">Delete All</button> -->
+                            <button id="cancel-link-edits" class="btn btn-secondary">Cancel</button>
+                        </div>
                     </div>
                 </div>
             </div>

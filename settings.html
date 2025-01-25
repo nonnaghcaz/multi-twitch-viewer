@@ -72,6 +72,52 @@
                     </div>
                 </div>
             </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="debug-tools-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#debug-tools-item" aria-expanded="false" aria-controls="debug-tools-item">
+                        Debug Tools
+                    </button>
+                </h2>
+                <div id="debug-tools-item" class="accordion-collapse collapse" aria-labelledby="debug-tools-header" data-bs-parent="#settings-accordion">
+                    <div class="accordion-body">
+                        <div id="debug-twitch-response-container">
+                            <div class="row mb-3">
+                                <div class="col-auto">
+                                    <label for="debug-twitch-response-channel-name" class="form-label">Channel Name</label>
+                                    <input type="text" class="form-control" id="debug-twitch-response-channel-name" placeholder="Enter Channel Name">
+                                    <label for="debug-twitch-response-channel-name" id="debug-twitch-response-channel-name-error" class="invalid-feedback" style="display: none;"></label>
+                                </div>
+                                <div class="col-auto">
+                                    <label for="debug-twitch-response-max-tries" class="form-label">Max Tries</label>
+                                    <input type="number" class="form-control" id="debug-twitch-response-max-tries" placeholder="Enter Max Tries" value="5" min="0" max="10">
+                                    <label for="debug-twitch-response-max-tries" id="debug-twitch-response-max-tries-error" class="invalid-feedback" style="display: none;"></label>
+                                </div>
+                                <div class="col-auto">
+                                    <label for="debug-twitch-response-retry-delay" class="form-label">Retry Delay (ms)</label>
+                                    <input type="number" class="form-control" id="debug-twitch-response-retry-delay" placeholder="Enter Retry Delay in ms" value="1000" min="0" max="10000">
+                                    <label for="debug-twitch-response-retry-delay" id="debug-twitch-response-retry-delay-error" class="invalid-feedback" style="display: none;"></label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        <label class="form-check-label" for="debug-twitch-response-try-until-live">Try Until Live</label>
+                                        <input type="checkbox" class="form-check-input" id="debug-twitch-response-try-until-live">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-auto">
+                                    <button id="debug-twitch-response-submit" class="btn btn-primary">Fetch Twitch Response</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <textarea class="form-control" id="debug-twitch-response-output" rows="10" placeholder="Parsed data will be displayed here, full response in the console."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="js/vendor/bootstrap.bundle.min.js"></script>

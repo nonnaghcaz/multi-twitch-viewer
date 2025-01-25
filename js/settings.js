@@ -1,4 +1,4 @@
-import { addAuthorChannelsToStorage, addChannelsToStorage, removeChannelsFromStorage } from "./modules/channel.js";
+import { addAuthorChannelsToStorage, addChannelsToStorage, getTwitchResponse, parseTwitchResponse, removeChannelsFromStorage } from "./modules/channel.js";
 import { STORAGE_CHANNELS_KEY, STORAGE_LINKS_KEY } from "./modules/constants.js";
 import { addAuthorLinksToStorage, removeLinksFromStorage } from "./modules/links.js";
 import { readLocalStorage, writeLocalStorage } from "./modules/storage.js";
@@ -8,6 +8,69 @@ document.addEventListener("DOMContentLoaded", _onReady);
 function _onReady() {
     _initChannels();
     _initLinks();
+    _initDebugTools();
+}
+
+function _initDebugTools() {
+    var debugTwitchResponseButton = document.getElementById("debug-twitch-response-submit");
+    debugTwitchResponseButton.addEventListener("click", _handleDebugTwitchResponse);
+}
+
+function _hideDebugTwitchResponseErrors(ids=["debug-twitch-response-channel-name-error", "debug-twitch-response-max-tries-error", "debug-twitch-response-retry-delay-error"], clear=false) {
+    ids.forEach((id) => {
+        var errorElem = document.getElementById(id);
+        errorElem.style.display = "none";
+        if (clear) {
+            errorElem.innerText = "";
+        }
+    });
+}
+
+function _showDebugTwitchResponseError(id, message) {
+    var errorElem = document.getElementById(id);
+    errorElem.innerText = message;
+    errorElem.style.display = "block";
+    return errorElem;
+}
+
+function _handleDebugTwitchResponse(e) {
+    var channel = document.getElementById("debug-twitch-response-channel-name").value;
+    var maxTries = document.getElementById("debug-twitch-response-max-tries").value;
+    var retryDelay = document.getElementById("debug-twitch-response-retry-delay").value;
+    var tryUntilLive = document.getElementById("debug-twitch-response-try-until-live").checked;
+    var outputContainer = document.getElementById("debug-twitch-response-output");
+    outputContainer.value = "";
+
+    var fail = false;
+
+    _hideDebugTwitchResponseErrors();
+
+    if (!channel) {
+        fail = true;
+        _showDebugTwitchResponseError("debug-twitch-response-channel-name-error", "Required");
+    }
+
+    if (maxTries < 0) {
+        fail = true;
+        _showDebugTwitchResponseError("debug-twitch-response-max-tries-error", "Cannot be less than 0");
+    }
+
+    if (retryDelay < 0) {
+        fail = true;
+        _showDebugTwitchResponseError("debug-twitch-response-retry-delay-error", "Cannot be less than 0");
+    }
+
+    if (fail) {
+        return;
+    }
+
+    getTwitchResponse(channel, maxTries, retryDelay, tryUntilLive).then((response) => {
+        var data = parseTwitchResponse(response);
+        outputContainer.value = JSON.stringify(data, null, 4);
+
+        var doc = new DOMParser().parseFromString(response, "text/html");
+        console.log(`Response for ${channel}`, doc);
+    });
 }
 
 

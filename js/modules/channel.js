@@ -21,16 +21,28 @@ async function getTwitchResponse(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, ret
 
 async function getChannelData(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryDelay=TWITCH_DEFAULT_RETRY_DELAY, tryUntilLive=false) {
     const text = await getTwitchResponse(channel, maxTries, retryDelay, tryUntilLive);
-    const doc = new DOMParser().parseFromString(text, "text/html");
-    const isWatching = await isWatchingChannel(channel);
-    const isLive = _isChannelLiveFromResponse(doc);
-    var data = { channel, isLive, isWatching, streamTitle: null };
-    if (isLive) {
-        const streamTitle = _getStreamTitleFromResponse(doc);
-        if (!streamTitle) {
-            console.error("Failed to get stream title from text", doc);
-        }
-        data.streamTitle = streamTitle;
+    var doc = new DOMParser().parseFromString(text, "text/html");
+    var isWatching = await isWatchingChannel(channel);
+    var data = _parseChannelDataFromResponse(doc);
+    data.isWatching = isWatching;
+    data.channel = channel;
+    data.raw = text;
+
+    return data;
+}
+
+function parseTwitchResponse(text) {
+    var doc = new DOMParser().parseFromString(text, "text/html");
+    return _parseChannelDataFromResponse(doc);
+}
+
+function _parseChannelDataFromResponse(doc) {
+    var isLive = _isChannelLiveFromResponse(doc);
+    var streamTitle = _getStreamTitleFromResponse(doc);
+
+    var data = { isLive, streamTitle };
+    if (isLive && !streamTitle) {
+        console.error("Failed to get stream title from text", doc);
     }
 
     return data;
@@ -101,5 +113,5 @@ async function removeChannelsFromStorage(channels) {
 }
 
 
-export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, isChannelLive, removeChannelFromStorage, removeChannelsFromStorage };
+export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, getTwitchResponse, isChannelLive, parseTwitchResponse, removeChannelFromStorage, removeChannelsFromStorage };
 

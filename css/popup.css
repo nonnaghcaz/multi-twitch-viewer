@@ -11,3 +11,7 @@ body {
     font-size: 1rem;
     font-weight: 500;
 }
+
+table.dataTable tbody td {
+    vertical-align: middle;
+  }

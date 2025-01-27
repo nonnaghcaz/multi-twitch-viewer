@@ -1,6 +1,9 @@
-import { getChannelData } from "./channel.js";
+import { getChannelData, getChannelDatas } from "./channel.js";
 import { FA_CIRCLE_CHECK, FA_CIRCLE_XMARK, STORAGE_CHANNELS_KEY, TABLE_BUTTON_REFESH, TABLE_BUTTON_SELECT_ALL, TABLE_BUTTON_SELECT_CLEAR, TABLE_BUTTON_SELECT_LIVE, TABLE_DATASET_FALSE, TABLE_DATASET_TRUE, TABLE_HEADER_CHANNEL_NAME, TABLE_HEADER_CHANNEL_SELECT, TABLE_HEADER_STREAM_ISLIVE, TABLE_HEADER_STREAM_TITLE, TABLE_TRUNCATE_LENGTH } from "./constants.js";
+import { FA_GRIP_LINES, FA_SLIDERS } from "./fa_svgs.js";
 import { readLocalStorage } from "./storage.js";
+
+var _currentIndex = 0;
 
 function truncateText(text, length) {
     return text.length > length ? text.slice(0, length) + "..." : text;
@@ -15,21 +18,45 @@ function initTable(selector) {
         autoWidth: false,
         columns: [
             {
+                data: "index",
+                title: FA_SLIDERS,
+                searchable: false,
+                orderable: false,
+                width: "10%",
+                render: function(data, type, row) {
+                    if (type === "display") {
+                        var _p = new DOMParser()
+                        var _span = document.createElement("span");
+                        var _svg = _p.parseFromString(FA_GRIP_LINES, "image/svg+xml").documentElement;
+                        _svg.classList.add("icon");
+                        _span.classList.add("badge");
+                        _span.classList.add("badge-primary");
+                        _span.style.cursor = "grab";
+                        _span.title = "Drag to Reorder";
+                        _span.appendChild(_svg);
+
+                        
+                        return _span.outerHTML;
+                    }
+                    return data;
+                }
+            },
+            {
                 data: "selection",
                 title: TABLE_HEADER_CHANNEL_SELECT,
-                orderable: true,
+                orderable: false,
                 searchable: false,
                 type: "checkbox",
                 className: "channel-checkbox",
                 render: function(data, type, row) {
-                    return `<input type='checkbox' name='channel-select' ${data ? 'checked' : ''}>`;
+                    return `<input type='checkbox' name='channel-select' style='cursor: pointer;' ${data ? 'checked' : ''}>`;
                 },
                 width: "10%",
             },
             {
                 data: "channel",
                 title: TABLE_HEADER_CHANNEL_NAME,
-                orderable: true,
+                orderable: false,
                 searchable: true,
                 render: function(data, type, row) {
                     if (type === "display") {
@@ -43,7 +70,7 @@ function initTable(selector) {
             {
                 data: "isLive",
                 title: TABLE_HEADER_STREAM_ISLIVE,
-                orderable: true,
+                orderable: false,
                 searchable: false,
                 render: function(data, type, row) {
                     // return data === "Live" ? `<span class="badge bg-success">${data}</span>` : `<span class="badge bg-danger">${data}</span>`;
@@ -81,7 +108,7 @@ function initTable(selector) {
                         if (!data) {
                             return "";
                         }
-                        return `<span title="${data.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" class="stream-title">${truncateText(data, TABLE_TRUNCATE_LENGTH)}</span>`;
+                        return `<span title="${data.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" class="stream-title" style="cursor:help;">${truncateText(data, TABLE_TRUNCATE_LENGTH)}</span>`;
                     }
                     return data;
                 },
@@ -89,11 +116,14 @@ function initTable(selector) {
             }
         ],
         columnDefs: [
-            { className: "dt-head-center", targets: [ 0, 1, 2, 3] },
-            { className: "dt-body-center", targets: [ 0, 2] }
+            { className: "dt-head-center", targets: [ 0, 1, 2, 3, 4] },
+            { className: "dt-body-center", targets: [ 0, 1, 3] }
         ],
         scrollY: "300px",
-        order: [[0, "desc"], [2, "desc"], [1, "asc"]],
+        // order: [[1, "desc"], [3, "desc"], [2, "asc"]],
+        rowReorder: {
+            dataSrc: "index",
+        },
         buttons: [
             {
                 title: "Refresh Table",
@@ -224,9 +254,7 @@ function _updateDeleteButtonVisibility(selector) {
 function drawTable(selector) {
     var table = getTable(selector);
     readLocalStorage(STORAGE_CHANNELS_KEY).then((channels) => {
-        channels.forEach((channel) => {
-            addRow(selector, channel);
-        });
+        addRows(selector, channels);
     });
     table.columns.adjust().draw();
 }
@@ -236,33 +264,50 @@ function clearTable(selector) {
     table.clear();
 }
 
-function addRow(selector, channel) {
+function addRows(selector, channels) {
+    getChannelDatas(channels).then((datas) => {
+        _addChannelDatasToTable(selector, datas);
+    });
+}
+
+function _addChannelDatasToTable(selector, datas) {
+    datas.forEach((data) => {
+        _addChannelDataToTable(selector, data);
+    });
+}
+
+function _addChannelDataToTable(selector, data) {
     var table = getTable(selector);
-    getChannelData(channel).then((data) => {
-        var isLive = data.isLive;
-        var streamTitle = data.streamTitle;
-        var isWatching = data.isWatching;
-        var channel = data.channel;
-        var row = table.row.add({
-            selection: isWatching ? 1 : 0, 
-            channel: channel,
-            isLive: isLive ? 1 : 0,
-            streamTitle: streamTitle
-        }).draw().node();
-        if (!row) {
-            console.error("Failed to add row to table", JSON.stringify(data));
-            return;
-        }
-        row.dataset.channel = channel;
-        row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
-        row.dataset.streamTitle = streamTitle;
-        row.dataset.isWatching = isWatching ? TABLE_DATASET_TRUE : TABLE_DATASET_FALSE;
-        var checkbox = $(row).find('input[type="checkbox"]');
-        checkbox.prop('checked', isWatching);
-        checkbox.on('change', function() {
-            _updateDeleteButtonVisibility(selector);
-        });
+    var isLive = data.isLive;
+    var streamTitle = data.streamTitle;
+    var isWatching = data.isWatching;
+    var channel = data.channel;
+    var row = table.row.add({
+        index: data.index,
+        selection: isWatching ? 1 : 0, 
+        channel: channel,
+        isLive: isLive ? 1 : 0,
+        streamTitle: streamTitle
+    }).draw().node();
+    if (!row) {
+        console.error("Failed to add row to table", JSON.stringify(data));
+        return;
+    }
+    row.dataset.channel = channel;
+    row.dataset.isLive = isLive ? TABLE_DATASET_FALSE : TABLE_DATASET_TRUE;
+    row.dataset.streamTitle = streamTitle;
+    row.dataset.isWatching = isWatching ? TABLE_DATASET_TRUE : TABLE_DATASET_FALSE;
+    var checkbox = $(row).find('input[type="checkbox"]');
+    checkbox.prop('checked', isWatching);
+    checkbox.on('change', function() {
         _updateDeleteButtonVisibility(selector);
+    });
+    _updateDeleteButtonVisibility(selector);
+}
+
+function addRow(selector, channel) {
+    getChannelData(channel).then((data) => {
+        _addChannelDataToTable(selector, data);
     }).catch((error) => {
         console.error(`Failed to get channel data for ${channel}: ${error}`);
     });

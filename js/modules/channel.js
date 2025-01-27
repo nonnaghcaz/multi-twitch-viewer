@@ -19,6 +19,39 @@ async function getTwitchResponse(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, ret
     });
 }
 
+
+function sortChannelDatas(a, b) {
+    var isLiveA = a.isLive ? 1 : 0;
+    var isLiveB = b.isLive ? 1 : 0;
+    var isLive = isLiveA - isLiveB;
+    var isWatchingA = a.isWatching ? 1 : 0;
+    var isWatchingB = b.isWatching ? 1 : 0;
+    var isWatching = isWatchingA - isWatchingB;
+    var channelA = a.channel.toLowerCase();
+    var channelB = b.channel.toLowerCase();
+     if (isLiveA === isLiveB) {
+        if (isWatchingA === isWatchingB) {
+            return channelA.localeCompare(channelB);
+        } else if (isWatchingA > isWatchingB) {
+            return -1;
+        } else {
+            return 1;
+        }
+    } else if (isLiveA > isLiveB) {
+        return -1;
+    } else {
+        return 1;
+    }
+}
+
+function reindexChannelDatas(channelDatas) {
+    var index = 0;
+    channelDatas.forEach((data) => {
+        data.index = index++;
+    });
+    return channelDatas;
+}
+
 async function getChannelData(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryDelay=TWITCH_DEFAULT_RETRY_DELAY, tryUntilLive=false) {
     const text = await getTwitchResponse(channel, maxTries, retryDelay, tryUntilLive);
     var doc = new DOMParser().parseFromString(text, "text/html");
@@ -29,6 +62,18 @@ async function getChannelData(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryD
     data.raw = text;
 
     return data;
+}
+
+async function getChannelDatas(channels, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryDelay=TWITCH_DEFAULT_RETRY_DELAY, tryUntilLive=false, sort=true, reindex=true) {
+    var promises = channels.map((channel) => getChannelData(channel, maxTries, retryDelay, tryUntilLive));
+    var channelDatas = await Promise.all(promises);
+    if (sort) {
+        channelDatas.sort(sortChannelDatas);
+    }
+    if (reindex) {
+        channelDatas = reindexChannelDatas(channelDatas);
+    }
+    return channelDatas;
 }
 
 function parseTwitchResponse(text) {
@@ -113,5 +158,5 @@ async function removeChannelsFromStorage(channels) {
 }
 
 
-export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getStoredChannels, getStreamTitle, getTwitchResponse, isChannelLive, parseTwitchResponse, removeChannelFromStorage, removeChannelsFromStorage };
+export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getChannelDatas, getStoredChannels, getStreamTitle, getTwitchResponse, isChannelLive, parseTwitchResponse, removeChannelFromStorage, removeChannelsFromStorage, sortChannelDatas };
 

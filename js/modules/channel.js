@@ -1,4 +1,4 @@
-import { CHANNEL_AUTHOR_PICKS, STORAGE_CHANNELS_KEY, TWITCH_DEFAULT_MAX_TRIES, TWITCH_DEFAULT_RETRY_DELAY, TWITCH_STREAM_ISLIVE_TEXT, TWITCH_STREAM_ISLIVE_XPATH, TWITCH_STREAM_TITLE_ATTRIBUTE, TWITCH_STREAM_TITLE_XPATH } from "./constants.js";
+import { CHANNEL_AUTHOR_PICKS, STORAGE_CHANNELS_KEY, TWITCH_DEFAULT_MAX_TRIES, TWITCH_DEFAULT_RETRY_DELAY } from "./constants.js";
 import { getElementByXpath } from "./dom.js";
 import { readLocalStorage, writeLocalStorage } from "./storage.js";
 import { isWatchingChannel } from "./tab.js";
@@ -57,14 +57,13 @@ async function getChannelData(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryD
     var doc = new DOMParser().parseFromString(text, "text/html");
     var isWatching = await isWatchingChannel(channel);
     var data = _parseChannelDataFromResponse(doc);
-if (!data) {
+    if (!data) {
         data = {}
     }
     if (!data.channel) {
         data.channel = channel;
     }
     data.isWatching = isWatching;
-    data.channel = channel;
     data.raw = text;
 
     return data;
@@ -88,38 +87,51 @@ function parseTwitchResponse(text) {
 }
 
 function _parseChannelDataFromResponse(doc) {
-    var isLive = _isChannelLiveFromResponse(doc);
-    var streamTitle = _getStreamTitleFromResponse(doc);
+    /*
+        {
+        "@context": "http://schema.org",
+        "@graph": [
+            {
+            "@type": "VideoObject",
+            "description": "LEO ESCOBAR | NOPIXEL",
+            "embedUrl": "https://player.twitch.tv/?channel=imbladee_\u0026player=facebook\u0026autoplay=true\u0026parent=meta.tag",
+            "name": "ImBladee_ - Twitch",
+            "thumbnailUrl": [
+                "https://static-cdn.jtvnw.net/previews-ttv/live_user_imbladee_-80x45.jpg",
+                "https://static-cdn.jtvnw.net/previews-ttv/live_user_imbladee_-320x180.jpg",
+                "https://static-cdn.jtvnw.net/previews-ttv/live_user_imbladee_-640x360.jpg"
+            ],
+            "uploadDate": "2025-01-29T21:40:38Z",
+            "publication": {
+                "@type": "BroadcastEvent",
+                "endDate": "2025-01-30T02:19:28Z",
+                "startDate": "2025-01-29T21:40:38Z",
+                "isLiveBroadcast": true
+            }
+            }
+        ]
+        }
+    */
 
-    var data = { isLive, streamTitle };
+    var script = getElementByXpath("//script[@type='application/ld+json']", doc);
+
+    try {
+        var json = JSON.parse(script.textContent);
+    } catch (error) {
+        return null;
+    }
+
+    var isLive = json["@graph"][0].publication.isLiveBroadcast;
+    var streamTitle = json["@graph"][0].description;
+    var uploadDate = json["@graph"][0].uploadDate;
+    var channel = json["@graph"][0].name.split(" - Twitch")[0];
+
+    var data = { channel, isLive, streamTitle, uploadDate, raw: json };
     if (isLive && !streamTitle) {
         console.error("Failed to get stream title from text", doc);
     }
 
     return data;
-}
-
-async function getStreamTitle(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryDelay=TWITCH_DEFAULT_RETRY_DELAY, tryUntilLive=false) {
-    const text = await getTwitchResponse(channel, maxTries, retryDelay, tryUntilLive);
-    const doc = new DOMParser().parseFromString(text, "text/html");
-    return _getStreamTitleFromResponse(doc);
-}
-
-function _getStreamTitleFromResponse(doc) {
-    // Parse the meta:description tag from the response
-    const element = getElementByXpath(TWITCH_STREAM_TITLE_XPATH, doc);
-    return element ? element.getAttribute(TWITCH_STREAM_TITLE_ATTRIBUTE) : null;
-}
-
-async function isChannelLive(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryDelay=TWITCH_DEFAULT_RETRY_DELAY, tryUntilLive=false) {
-    const text = await getTwitchResponse(channel, maxTries, retryDelay, tryUntilLive);
-    const doc = new DOMParser().parseFromString(text, "text/html");
-    return _isChannelLiveFromResponse(doc);
-}
-
-function _isChannelLiveFromResponse(doc) {
-    const element = getElementByXpath(TWITCH_STREAM_ISLIVE_XPATH, doc);
-    return element && element.textContent.includes(TWITCH_STREAM_ISLIVE_TEXT);
 }
 
 // -------------------------------------------------------------------------------------
@@ -164,5 +176,5 @@ async function removeChannelsFromStorage(channels) {
 }
 
 
-export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getChannelDatas, getStoredChannels, getStreamTitle, getTwitchResponse, isChannelLive, parseTwitchResponse, removeChannelFromStorage, removeChannelsFromStorage, sortChannelDatas };
+export { addAuthorChannelsToStorage, addChannelsToStorage, addChannelToStorage, getChannelData, getChannelDatas, getStoredChannels, getTwitchResponse, parseTwitchResponse, removeChannelFromStorage, removeChannelsFromStorage, sortChannelDatas };
 

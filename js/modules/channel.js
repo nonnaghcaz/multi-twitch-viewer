@@ -57,6 +57,12 @@ async function getChannelData(channel, maxTries=TWITCH_DEFAULT_MAX_TRIES, retryD
     var doc = new DOMParser().parseFromString(text, "text/html");
     var isWatching = await isWatchingChannel(channel);
     var data = _parseChannelDataFromResponse(doc);
+if (!data) {
+        data = {}
+    }
+    if (!data.channel) {
+        data.channel = channel;
+    }
     data.isWatching = isWatching;
     data.channel = channel;
     data.raw = text;

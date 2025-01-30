@@ -278,10 +278,10 @@ function _addChannelDatasToTable(selector, datas) {
 
 function _addChannelDataToTable(selector, data) {
     var table = getTable(selector);
-    var isLive = data.isLive;
-    var streamTitle = data.streamTitle;
-    var isWatching = data.isWatching;
-    var channel = data.channel;
+    var isLive = data.isLive || false;
+    var streamTitle = data.streamTitle || "";
+    var isWatching = data.isWatching || false;
+    var channel = data.channel || "";
     var row = table.row.add({
         index: data.index,
         selection: isWatching ? 1 : 0, 

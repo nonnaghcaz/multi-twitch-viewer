@@ -62,7 +62,11 @@ async function isWatchingChannel(channel) {
     if (!(isOnMultiStreamPageResult || isOnTwitchPageResult)) {
         return false;
     }
-    const channels = await getChannelsFromTabUrl();
+    let channels = await getChannelsFromTabUrl();
+    if (channels.length === 0) {
+        return false;
+    }
+    channels = channels.map(channel => channel.toLowerCase());
     return channels.includes(channel);
 }
 
